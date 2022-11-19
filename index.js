@@ -54,7 +54,7 @@ app.post("/api/persons", (req, res) => {
     number,
   }
   persons.push(newPerson)
-  res.json(newPerson)
+  res.status(201).json(newPerson)
 })
 
 app.get("/api/persons/:id", (req, res) => {
