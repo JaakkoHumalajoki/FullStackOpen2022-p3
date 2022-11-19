@@ -1,5 +1,6 @@
 const express = require("express")
 const app = express()
+app.use(express.json())
 const PORT = 3001
 
 let persons = [
@@ -25,6 +26,10 @@ let persons = [
   },
 ]
 
+const newId = () => {
+  return Math.floor(Math.random() * 1_000_000_000)
+}
+
 app.get("/", (_req, res) => {
   res.send("<h1>Hi!</h1><a href='/api/persons'>Persons API</a>")
 })
@@ -39,6 +44,17 @@ app.get("/info", (_req, res) => {
 
 app.get("/api/persons", (_req, res) => {
   res.json(persons)
+})
+
+app.post("/api/persons", (req, res) => {
+  const { name, number } = req.body
+  const newPerson = {
+    id: newId(),
+    name,
+    number,
+  }
+  persons.push(newPerson)
+  res.json(newPerson)
 })
 
 app.get("/api/persons/:id", (req, res) => {
