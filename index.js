@@ -48,6 +48,16 @@ app.get("/api/persons", (_req, res) => {
 
 app.post("/api/persons", (req, res) => {
   const { name, number } = req.body
+  if (!name || !number) {
+    res.status(400).json({ error: "Missing name or number" })
+    return
+  }
+  const sameNamePerson = persons.find(p => p.name === name)
+  if (sameNamePerson) {
+    res.status(400).json({ error: "Name must be unique" })
+    return
+  }
+
   const newPerson = {
     id: newId(),
     name,
