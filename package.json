@@ -5,6 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "build:ui": "rm -rf build && cd ../Full-Stack-MOOC/part2/phonebook && npm run build && cp -r build ../../../Full-Stack-MOOC-P3",
+    "deploy": "fly deploy",
+    "deploy:full": "npm run build:ui && npm run deploy",
+    "logs": "fly logs",
     "dev": "nodemon index.js"
   },
   "keywords": [],

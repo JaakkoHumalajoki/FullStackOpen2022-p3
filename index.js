@@ -1,6 +1,7 @@
 const express = require("express")
 const cors = require("cors")
 const app = express()
+app.use(express.static("build"))
 app.use(express.json())
 app.use(cors())
 
@@ -45,10 +46,6 @@ let persons = [
 const newId = () => {
   return Math.floor(Math.random() * 1_000_000_000)
 }
-
-app.get("/", (_req, res) => {
-  res.send("<h1>Hi!</h1><a href='/api/persons'>Persons API</a>")
-})
 
 app.get("/info", (_req, res) => {
   const time = new Date()
