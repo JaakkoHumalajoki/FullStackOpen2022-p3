@@ -56,15 +56,19 @@ app.post("/api/persons", async (req, res, next) => {
   }
 })
 
-// app.get("/api/persons/:id", (req, res) => {
-//   const id = Number(req.params.id)
-//   const person = persons.find((p) => p.id === id)
-//   if (!person) {
-//     res.status(404).end()
-//   } else {
-//     res.json(person)
-//   }
-// })
+app.get("/api/persons/:id", async (req, res, next) => {
+  const id = req.params.id
+  try {
+    const person = await Person.findById(id)
+    if (!person) {
+      res.status(404).end()
+      return
+    }
+    res.json(person)
+  } catch (err) {
+    next(err)
+  }
+})
 
 app.put("/api/persons/:id", async (req, res, next) => {
   const { name, number } = req.body
@@ -87,7 +91,7 @@ app.put("/api/persons/:id", async (req, res, next) => {
 
     const updatedPerson = await Person.findByIdAndUpdate(id, person, { new: true })
     res.json(updatedPerson)
-    
+
   } catch (err) {
     next(err)
   }
