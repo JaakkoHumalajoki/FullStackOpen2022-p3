@@ -1,4 +1,5 @@
 const express = require("express")
+const Person = require("./database/person")
 const cors = require("cors")
 const app = express()
 app.use(express.static("build"))
@@ -56,7 +57,7 @@ app.get("/info", (_req, res) => {
 })
 
 app.get("/api/persons", (_req, res) => {
-  res.json(persons)
+  Person.find({}).then((people) => res.json(people))
 })
 
 app.post("/api/persons", (req, res) => {
