@@ -21,86 +21,56 @@ app.use(
   })
 )
 
-let persons = [
-  {
-    id: 1,
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: 2,
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: 3,
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: 4,
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-]
-
-const newId = () => {
-  return Math.floor(Math.random() * 1_000_000_000)
-}
-
-app.get("/info", (_req, res) => {
+app.get("/info", async (_req, res) => {
+  const people = await Person.find({})
   const time = new Date()
   res.send(
-    `<p>Phonebook has info for ${persons.length} people</p>
-    </p>${time}</p>`
+    `<p>Phonebook has info for ${people.length} people</p><p>${time}</p>`
   )
 })
 
-app.get("/api/persons", (_req, res) => {
-  Person.find({}).then((people) => res.json(people))
+app.get("/api/persons", async (_req, res) => {
+  const people = await Person.find({})
+  res.json(people)
 })
 
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", async (req, res) => {
   const { name, number } = req.body
   if (!name || !number) {
     res.status(400).json({ error: "Missing name or number" })
     return
   }
-  const sameNamePerson = persons.find((p) => p.name === name)
-  if (sameNamePerson) {
+  const sameNamePerson = await Person.find({ name })
+  if (sameNamePerson.length > 0) {
     res.status(400).json({ error: "Name must be unique" })
     return
   }
 
-  const newPerson = {
-    id: newId(),
-    name,
-    number,
-  }
-  persons.push(newPerson)
-  res.status(201).json(newPerson)
+  const newPerson = new Person({ name: name, number: number })
+  savedPerson = await newPerson.save()
+  res.status(201).json(savedPerson)
 })
 
-app.get("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id)
-  const person = persons.find((p) => p.id === id)
-  if (!person) {
-    res.status(404).end()
-  } else {
-    res.json(person)
-  }
-})
+// app.get("/api/persons/:id", (req, res) => {
+//   const id = Number(req.params.id)
+//   const person = persons.find((p) => p.id === id)
+//   if (!person) {
+//     res.status(404).end()
+//   } else {
+//     res.json(person)
+//   }
+// })
 
-app.delete("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id)
-  const person = persons.find((p) => p.id === id)
-  if (!person) {
-    res.status(404).end()
-  } else {
-    persons = persons.filter((p) => p.id !== id)
-    res.status(204).end()
-  }
-})
+// app.delete("/api/persons/:id", (req, res) => {
+//   const id = Number(req.params.id)
+//   const person = persons.find((p) => p.id === id)
+//   if (!person) {
+//     res.status(404).end()
+//   } else {
+//     persons = persons.filter((p) => p.id !== id)
+//     res.status(204).end()
+//   }
+// })
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
