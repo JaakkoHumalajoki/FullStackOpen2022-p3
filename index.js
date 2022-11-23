@@ -61,16 +61,17 @@ app.post("/api/persons", async (req, res) => {
 //   }
 // })
 
-// app.delete("/api/persons/:id", (req, res) => {
-//   const id = Number(req.params.id)
-//   const person = persons.find((p) => p.id === id)
-//   if (!person) {
-//     res.status(404).end()
-//   } else {
-//     persons = persons.filter((p) => p.id !== id)
-//     res.status(204).end()
-//   }
-// })
+app.delete("/api/persons/:id", async (req, res) => {
+  const id = req.params.id
+  try {
+    await Person.findByIdAndDelete(id)
+    res.status(204).end()
+    res.status()
+  } catch (error) {
+    console.log(error)
+    res.status(404).end()
+  }
+})
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
