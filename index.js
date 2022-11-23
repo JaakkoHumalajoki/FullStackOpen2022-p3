@@ -34,21 +34,26 @@ app.get("/api/persons", async (_req, res) => {
   res.json(people)
 })
 
-app.post("/api/persons", async (req, res) => {
+app.post("/api/persons", async (req, res, next) => {
   const { name, number } = req.body
   if (!name || !number) {
     res.status(400).json({ error: "Missing name or number" })
     return
   }
-  const sameNamePerson = await Person.find({ name })
-  if (sameNamePerson.length > 0) {
-    res.status(400).json({ error: "Name must be unique" })
-    return
-  }
 
-  const newPerson = new Person({ name: name, number: number })
-  savedPerson = await newPerson.save()
-  res.status(201).json(savedPerson)
+  try {
+    const sameNamePerson = await Person.find({ name })
+    if (sameNamePerson.length > 0) {
+      res.status(400).json({ error: "Name must be unique" })
+      return
+    }
+
+    const newPerson = new Person({ name, number })
+    savedPerson = await newPerson.save()
+    res.status(201).json(savedPerson)
+  } catch (err) {
+    next(err)
+  }
 })
 
 // app.get("/api/persons/:id", (req, res) => {
@@ -61,17 +66,53 @@ app.post("/api/persons", async (req, res) => {
 //   }
 // })
 
-app.delete("/api/persons/:id", async (req, res) => {
+app.put("/api/persons/:id", async (req, res, next) => {
+  const { name, number } = req.body
+  if (!name || !number) {
+    res.status(400).json({ error: "Missing name or number" })
+    return
+  }
+  const id = req.params.id
+  try {
+    const oldPerson = await Person.findById(id)
+    if (!oldPerson) {
+      res.status(404).end()
+      return
+    }
+
+    const person = {
+      name,
+      number,
+    }
+
+    const updatedPerson = await Person.findByIdAndUpdate(id, person, { new: true })
+    res.json(updatedPerson)
+    
+  } catch (err) {
+    next(err)
+  }
+})
+
+app.delete("/api/persons/:id", async (req, res, next) => {
   const id = req.params.id
   try {
     await Person.findByIdAndDelete(id)
     res.status(204).end()
-    res.status()
-  } catch (error) {
-    console.log(error)
-    res.status(404).end()
+  } catch (err) {
+    next(err)
   }
 })
+
+const errorHandler = (err, _req, res, next) => {
+  console.log(err)
+  if (err.name === "CastError") {
+    return res.status(400).send({ error: "malformatted id" })
+  }
+
+  next(err)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
