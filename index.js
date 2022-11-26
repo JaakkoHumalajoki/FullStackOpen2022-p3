@@ -44,7 +44,7 @@ app.post("/api/persons", async (req, res, next) => {
   try {
     const sameNamePerson = await Person.find({ name })
     if (sameNamePerson.length > 0) {
-      res.status(400).json({ error: "Name must be unique" })
+      res.status(400).json({ error: `${name} already exists in database, reload page` })
       return
     }
 

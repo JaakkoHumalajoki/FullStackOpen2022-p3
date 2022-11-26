@@ -13,10 +13,19 @@ mongoose
 const personSchema = new mongoose.Schema({
   name: {
     type: String,
-    minLength: 3,
     required: true,
+    unique: true,
+    minLength: 3,
   },
-  number: String,
+  number: {
+    type: String,
+    required: true,
+    minLength: 8,
+    validate: {
+      validator: (value) => /\d{2,3}-\d{4,}/.test(value),
+      message: () => "Number must be in format 00-000000 or 000-000000",
+    },
+  },
 })
 
 personSchema.set("toJSON", {
