@@ -22,7 +22,7 @@ const personSchema = new mongoose.Schema({
     required: true,
     minLength: 8,
     validate: {
-      validator: (value) => /\d{2,3}-\d{4,}/.test(value),
+      validator: (value) => /^\d{2,3}-\d{4,}$/.test(value),
       message: () => "Number must be in format 00-000000 or 000-000000",
     },
   },
